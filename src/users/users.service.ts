@@ -1,32 +1,44 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
-export type User = any;
+import { User } from './user.entity';
+import { CreateUserDto } from './user.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[];
+  private saltRounds = 10;
 
-  constructor() {
-    this.users = [
-      {
-        userId: 1,
-        username: 'john',
-        password: 'changeme',
-      },
-      {
-        userId: 2,
-        username: 'chris',
-        password: 'secret',
-      },
-      {
-        userId: 3,
-        username: 'maria',
-        password: 'guess',
-      },
-    ];
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
+
+  async findOne(id: string): Promise<User | undefined> {
+    return this.usersRepository.findOne(id);
   }
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find(user => user.username === username);
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({email});
   }
+
+  async createUser(user: CreateUserDto) {
+    const newUser = new User();
+    newUser.email = user.email;
+    newUser.firstName = user.firstName;
+    newUser.lastName = user.lastName;
+    newUser.password = await this.getPasswordHash(user.password);
+    // TODO VALIDATE USER DATA - https://github.com/typestack/class-validator
+    return this.usersRepository.save(newUser);
+  }
+
+  async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
+  }
+
+  async getPasswordHash(password: string): Promise<string> {
+    return bcrypt.hash(password, this.saltRounds);
+  }
+
 }

@@ -22,7 +22,7 @@ export class AppController {
 
   @Post('auth/register')
   async register(@Body() body: CreateUserDto, @Response() res: any) {
-      const validRegistration = this.authService.registerUser(body);
+      const validRegistration = await this.authService.registerUser(body);
 
       if (validRegistration) {
         return res.status(HttpStatus.CREATED);

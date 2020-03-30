@@ -25,7 +25,9 @@ export class AppController {
       const validRegistration = await this.authService.registerUser(body);
 
       if (validRegistration) {
-        return res.status(HttpStatus.CREATED);
+        return res.status(HttpStatus.CREATED).json({
+          message: 'New user registered!'
+        });
       }
 
       return res.status(HttpStatus.CONFLICT).json({

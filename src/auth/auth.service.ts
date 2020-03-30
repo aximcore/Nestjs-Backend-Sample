@@ -23,7 +23,7 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, id: user.id };
+    const payload = { email: user.email, id: user.id, firstName: user.firstName, lastName: user.lastName };
     
     return {
       access_token: this.jwtService.sign(payload),
@@ -35,9 +35,9 @@ export class AuthService {
 
     if (user) {
       return false;
-    } 
+    }
 
-    const entity = this.usersService.createUser(newUser);
-    return true;
+    const entity = await this.usersService.createUser(newUser);
+     return true;
   } 
 }

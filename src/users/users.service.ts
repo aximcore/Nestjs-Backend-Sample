@@ -15,7 +15,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async findOne(id: string): Promise<User | undefined> {
+  async findOne(id: number): Promise<User | undefined> {
     return this.usersRepository.findOne(id);
   }
 
@@ -31,6 +31,16 @@ export class UsersService {
     newUser.password = await this.getPasswordHash(user.password);
     // TODO VALIDATE USER DATA - https://github.com/typestack/class-validator
     return this.usersRepository.save(newUser);
+  }
+
+  async removeUser(id: number) {
+    const entity = await this.findOne(id);
+
+    if (!entity) {
+      throw new Error('Not found entity');
+    }
+
+    return this.usersRepository.remove(entity);
   }
 
   async comparePassword(password: string, hashedPassword: string): Promise<boolean> {

@@ -39,5 +39,9 @@ export class AuthService {
 
     const entity = await this.usersService.createUser(newUser);
      return true;
-  } 
+  }
+
+  async removeUser(id: number) {
+    return this.usersService.removeUser(id);
+  }
 }

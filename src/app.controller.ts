@@ -34,4 +34,18 @@ export class AppController {
         message: 'That e-mail address already registered!',
       });
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('auth/remove')
+  async removeUser(@Request() req: any, @Response() res: any) {
+    try {
+      await this.authService.removeUser(req.user.id);
+      return res.status(HttpStatus.OK).json({
+        message: 'Removed user!',
+      });
+    } catch (exception) {
+      console.error(exception);
+      return res.status(HttpStatus.EXPECTATION_FAILED).json({message: 'Something went wrong!'});
+    }
+  }
 }
